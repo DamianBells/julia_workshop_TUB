@@ -5,8 +5,6 @@ using DelimitedFiles
 #using BenchmarkTools
 #using Distributed
 
-include("FEM_laplace2d_v2_sim.jl")
-
 element = Tuple{Vararg{Int}} # element type. Allows varois DoF
 
 struct mesh
@@ -14,6 +12,8 @@ struct mesh
     elements::Array{element}   # elements: indices for coordinates {Int64}
     boundaries::Array{element}  #boundary elements: indices for coordinates {Int64}
 end
+
+include("FEM_simulator.jl")
 
 coordinates=readdlm("data/coordinates.txt")
 elements=convert(Array{Int64},readdlm("data/elements.txt"))
