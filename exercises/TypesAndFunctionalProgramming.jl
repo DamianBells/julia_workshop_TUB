@@ -12,7 +12,7 @@
 # Type annotation with "::":
 
 10::Int64
-4::Float64
+4.0::Float64
 
 # There is a hierarchy of types:
 
@@ -47,6 +47,16 @@ typeof(Albertovic)
 fieldnames(Programmer)
 Albertovic.fave_language
 
+function tryProgrammer(P::Programmer)
+    return P.birth_year::UInt16
+end
+
+println(tryProgrammer(Albertovic))
+
+# tryProgrammer(3)
+
+
+
 # type declaration with a parameter/placeholder, i.e. a generic type:
 struct Point{T}
  x::T
@@ -55,7 +65,18 @@ end
 
 # type instantiation:
 Origin = Point(0, 0) # Parameter T is Int64
+Origin.x
 RandomPoint = Point(rand(1, 2)[1,1], rand(1, 2)[1,2]) # Parameter T is Float64
+
+import Base. +
++(T::Point, R::Point) = T.x + R.x - (T.y + R.y)
+
++(Origin, Origin)
+
+# +(Origin, 2)
++(1,1)
+
+# [1 2; 3 4] + 1
 
 #####################################################
 ############### Small Exercise ######################
@@ -63,6 +84,20 @@ RandomPoint = Point(rand(1, 2)[1,1], rand(1, 2)[1,2]) # Parameter T is Float64
 
 # Create a struct 'BodyDatas' that contains the fields: name, weight and height. Choose proper contrete types!
 # Create an arbitrary instance of that struct!
+
+
+struct BodyDatas
+        name::String
+        weight::AbstractFloat
+        height::Int
+end
+
+x = BodyDatas("Ralf", 123.4, 196)
+typeof(x)
+
+
+
+
 
 #####################################################
 ############### Functional Programming in Julia #####
@@ -77,7 +112,7 @@ function compose(ϕ::Function, ϑ::Function)
     Γ = ϕ ∘ ϑ; # compare to notation in mathematical papers
 end
 
-fancyComposition = compose(sin, exp); # i.e.: x -> sin(exp(X)) = x -> (sin ∘ exp) (x)
+fancyComposition = compose(sin, exp) # i.e.: x -> sin(exp(x)) = x -> (sin ∘ exp) (x)
 fancyComposition(1.9) # i.e.: 1.9 -> sin(exp(1.9)) = 1.9 -> (sin ∘ exp) (1.9)
 
 # But there are unlike in Haskell no 'arrow-types' (see [4])
@@ -88,19 +123,24 @@ fancyComposition(1.9) # i.e.: 1.9 -> sin(exp(1.9)) = 1.9 -> (sin ∘ exp) (1.9)
 
 x = [1, 2, 3, 4, 2, 1, 3, 9.1, 4.112];
 f = x -> x^2;
-map(f, x) # one of the standard higher-order functions
+@code_llvm map(f, x) # one of the standard higher-order functions
+
 
 # compared to (which has some nice notion in the header of the for-loop):
 
-y = zeros(length(x))
-for i ∈ length(x)
+function g()
+    y = zeros(length(x))
+    @time for i ∈ length(x)
     y[i] = x[i].^2
+    end
+    return y
 end
-y
+
+@code_native g()
 
 # Another useful higher-order function:
-g = x-> x < 3;
-filter(g, x)
+h = x-> x < 3;
+filter(h, x)
 
 #####################################################
 ############### Small Exercise ######################
@@ -116,8 +156,10 @@ end
 # Test it on a number between 0 and 1
 # Test it on the array A = [0.1, 0.3, 0.1, 0.2, 0.4]
 # (You should make use of an other higher-order function)
-
-
+A = [0.1, 0.3, 0.1, 0.2, 0.4]
+broadcast(γ(log), A)
+@code_native γ(exp)
+@code_native γ(sin)
 #####################################################
 ############# Useful References #####################
 #####################################################
